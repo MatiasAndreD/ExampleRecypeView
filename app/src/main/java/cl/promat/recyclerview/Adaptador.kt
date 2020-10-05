@@ -10,17 +10,18 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class Adaptador(var contexto:Context, items:ArrayList<Comida>): RecyclerView.Adapter<Adaptador.ViewHolder>() {
+class Adaptador(items:ArrayList<Comida>,  var listener: Clicklistener, var longClickListener:LongClickListener): RecyclerView.Adapter<Adaptador.ViewHolder>() {
 
     var items:ArrayList<Comida>?= null
+    var multiseleccion = false
 
     init {
         this.items = items
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Adaptador.ViewHolder {
-        val vista = LayoutInflater.from(contexto).inflate(R.layout.template_platillo,parent,false)
-        val viewHolder = ViewHolder(vista)
+        val vista = LayoutInflater.from(parent.context).inflate(R.layout.template_platillo,parent,false)
+        val viewHolder = ViewHolder(vista,listener,longClickListener )
 
         return viewHolder
     }
@@ -33,22 +34,52 @@ class Adaptador(var contexto:Context, items:ArrayList<Comida>): RecyclerView.Ada
         holder.rating?.rating = item?.rating!!
     }
 
+    fun iniciarActionMode(){
+        multiseleccion = true
+    }
+
+    fun destruirActionMode(){
+        multiseleccion = false
+        notifyDataSetChanged()
+    }
+
+    fun terminarActionMode(){
+        //eliminar elementos seleccionados
+
+        multiseleccion = false
+    }
+
     override fun getItemCount(): Int {
         return items?.count()!!
     }
 
-    class ViewHolder(vista: View):RecyclerView.ViewHolder(vista){
+    class ViewHolder(vista: View, listener:Clicklistener, longClickListener: LongClickListener):RecyclerView.ViewHolder(vista), View.OnClickListener, View.OnLongClickListener{
         var vista = vista
         var nombre: TextView? = null
         var precio: TextView? = null
         var rating: RatingBar? = null
         var imagen: ImageView? = null
+        var listener:Clicklistener? = null
+        var longListener:LongClickListener? = null
 
         init {
             nombre = vista.findViewById(R.id.nombre)
             precio = vista.findViewById(R.id.precio)
             rating = vista.findViewById(R.id.rating)
             imagen = vista.findViewById(R.id.imagen)
+            this.listener = listener
+            this.longListener = longClickListener
+            vista.setOnLongClickListener(this)
+            vista.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View?) {
+            this.listener?.onClick(v!!,adapterPosition)
+        }
+
+        override fun onLongClick(v: View?): Boolean {
+            this.longListener?.longClick(v!!, adapterPosition)
+            return true
         }
     }
 
