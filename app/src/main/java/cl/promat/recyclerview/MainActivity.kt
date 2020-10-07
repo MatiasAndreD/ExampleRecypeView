@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     var layoutManager:RecyclerView.LayoutManager? = null
 
     var isActionMode = false
+    var actionMode:ActionMode? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,21 +42,40 @@ class MainActivity : AppCompatActivity() {
 
         // -------------------------------------- C O N F I G U R A R   A C T I O N   M O D E --------------------------------------------
         val callback = object: ActionMode.Callback{
-            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+
+                when(item?.itemId){
+                    R.id.iEliminar -> {
+                        Toast.makeText(applicationContext, "Eliminar objetos", Toast.LENGTH_SHORT).show()
+                        adaptador?.eliminarSeleccion()
+                    }
+                    else->{
+                        return true
+                    }
+                }
+
                 adaptador?.terminarActionMode()
                 mode?.finish()
                 isActionMode = false
+
+
+                return true
+            }
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                //Iniciar action mode
+                adaptador?.iniciarActionMode()
+                actionMode = mode
+
+                //inflar menu
+                menuInflater.inflate(R.menu.menu_contextual, menu!! )
                 return true
             }
 
             override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                mode?.title = "0 seleccionados"
                 return false
             }
 
-            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-                adaptador?.iniciarActionMode()
-                return true
-            }
 
             override fun onDestroyActionMode(mode: ActionMode?) {
 
@@ -83,6 +103,7 @@ class MainActivity : AppCompatActivity() {
                   //Hacer selecciones o deselecciones
                   adaptador?.seleccionarItem(index)
               }
+                actionMode?.title= adaptador?.obtenerNumeroElementosSeleccionados().toString() +" seleccionados"
             }
 
         })

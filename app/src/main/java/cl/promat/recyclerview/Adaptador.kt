@@ -71,6 +71,23 @@ class Adaptador(items:ArrayList<Comida>,  var listener: Clicklistener, var longC
 
     }
 
+    fun eliminarSeleccion(){
+        if(itemseleccionados?.count()!! > 0){
+            var itemEliminados = ArrayList<Comida>()
+
+            for(index in itemseleccionados!!){
+                itemEliminados.add(items?.get(index)!!)
+            }
+
+            items?.removeAll(itemEliminados)
+            itemseleccionados?.clear()
+        }
+    }
+
+    fun obtenerNumeroElementosSeleccionados():Int{
+        return itemseleccionados?.count()!!
+    }
+
     fun terminarActionMode(){
         //eliminar elementos seleccionados
         for(item in itemseleccionados!!){
