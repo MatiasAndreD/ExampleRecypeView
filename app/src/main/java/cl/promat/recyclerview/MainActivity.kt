@@ -77,9 +77,11 @@ class MainActivity : AppCompatActivity() {
               if(!isActionMode){
                   startSupportActionMode(callback)
                   isActionMode = true
+                  adaptador?.seleccionarItem(index)
 
               }else{
                   //Hacer selecciones o deselecciones
+                  adaptador?.seleccionarItem(index)
               }
             }
 

@@ -1,6 +1,7 @@
 package cl.promat.recyclerview
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,24 +15,37 @@ class Adaptador(items:ArrayList<Comida>,  var listener: Clicklistener, var longC
 
     var items:ArrayList<Comida>?= null
     var multiseleccion = false
+    var itemseleccionados:ArrayList<Int>? = null
+    var viewHolder:ViewHolder? = null
 
     init {
         this.items = items
+        itemseleccionados = ArrayList()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Adaptador.ViewHolder {
         val vista = LayoutInflater.from(parent.context).inflate(R.layout.template_platillo,parent,false)
-        val viewHolder = ViewHolder(vista,listener,longClickListener )
+        viewHolder = ViewHolder(vista,listener,longClickListener )
 
-        return viewHolder
+        return viewHolder!!
     }
 
     override fun onBindViewHolder(holder: Adaptador.ViewHolder, position: Int) {
+        //onBindViewHolder nos permite mapear los elementos graficos con los datos.
+
         val item = items?.get(position)
         holder.imagen?.setImageResource(item?.imagen!!)
         holder.nombre?.text = item?.nombre
         holder.precio?.text = "$" + item?.precio.toString()
         holder.rating?.rating = item?.rating!!
+
+        if(itemseleccionados?.contains(position)!!){
+            holder.vista.setBackgroundColor(Color.LTGRAY)
+        }else{
+            holder.vista.setBackgroundColor(Color.WHITE)
+        }
+
+
     }
 
     fun iniciarActionMode(){
@@ -40,12 +54,28 @@ class Adaptador(items:ArrayList<Comida>,  var listener: Clicklistener, var longC
 
     fun destruirActionMode(){
         multiseleccion = false
+        itemseleccionados?.clear()
         notifyDataSetChanged()
+
+    }
+
+    fun seleccionarItem(index:Int){
+        if(multiseleccion){
+            if(itemseleccionados?.contains(index)!!){
+                itemseleccionados?.remove(index)
+            }else{
+                itemseleccionados?.add(index)
+            }
+            notifyDataSetChanged()
+        }
+
     }
 
     fun terminarActionMode(){
         //eliminar elementos seleccionados
-
+        for(item in itemseleccionados!!){
+            itemseleccionados?.remove(item)
+        }
         multiseleccion = false
     }
 
